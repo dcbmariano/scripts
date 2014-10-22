@@ -19,8 +19,8 @@ except:
         print "\n############################# File | Function #############################\n"
 
 if parametro == "-h":
-        print "HELP ||||||||||||||||||||||||||||||||\nlistarScripts | Sintaxe: python listarscripts.py | Use [-d] to list description\n"
-        sys.exit()
+	print "HELP ||||||||||||||||||||||||||||||||\nlistarScripts | Sintaxe: python listarscripts.py | Use [-d] to list description\n"
+	sys.exit()
 
 while line != "":
         line = arquivo.readline()

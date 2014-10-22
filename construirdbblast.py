@@ -29,6 +29,6 @@ print "Construindo a database %s" %name[0]
 
 query = "makeblastdb -in %s -input_type fasta -dbtype prot -out %s_db -max_file_sz 1000MB -parse_seqids" %(arg1,name[0])
 
-#os.system(query)
-
+os.system(query)
+os.system("pwd")
 print "Concluido com sucesso."

@@ -3,7 +3,7 @@
 #    Function: Ler um arquivo fasta e retirar apenas o genero necessario
 # Description:
 #      Author: Diego Mariano
-#     Version: 2
+#     Version: 1
 
 from Bio import SeqIO
 import sys
@@ -15,16 +15,15 @@ try:
 	genero = sys.argv[2]
 	fail = False
 except:
-	print "Sintaxe: 'python parserfasta.py [file_name].fasta [Genero]'"
+	print "Sintaxe: 'python parserfasta.py [file_name].fasta'"
 	fail = True
-
-if fail == True:
-	sys.exit()
 
 name_out = "%s_out.fasta" %genero
 out = open(name_out,"w")
 out.close()
 
+if fail == True:
+	sys.exit()
 
 for i in SeqIO.parse(arquivo,"fasta"):
 	valores = i.description.rsplit("=")

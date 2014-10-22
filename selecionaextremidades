@@ -1,0 +1,2 @@
+#!/bin/bash
+python26 /home/dmariano/scripts/selecionaExtremidades.py $1 $2 $3

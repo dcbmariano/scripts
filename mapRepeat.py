@@ -1,9 +1,11 @@
 #! /usr/bin/python26
 #     Program: mapRepeat.py
 #    Function: Fechamento de gaps de regioes repetitivas
-# Description: Utiliza 5 scripts diferentes. Recebe dados de sequenciamento, arquivo de contigs e genoma referencia 
+# Description: Utiliza 5 scripts diferentes. Recebe dados de sequenciamento, arquivo de contigs e genoma referencia  // cut modificado para 3000
 #      Author: Diego Mariano
-#     Version: 1
+#     Version: 3
+
+# WARNING: MODIFICADO PARA SER EXECUTADO NO SIMBA
 
 from Bio import SeqIO
 import sys
@@ -15,7 +17,7 @@ try:
 		print "Syntax 'python mapRepeat.py [contigs aligned file] [reference file] [fastq xml folder] [contig left name] [contig right name]'"
 		sys.exit()
 except:
-	print "Syntax error. \nSyntax 'python mapRepeat.py [contigs aligned file] [reference file] [fastq folder] [contig left name] [contig right name]'"
+	print "Syntax error. \nSyntax 'python mapRepeat.py [contigs aligned file] [reference file] [fastq xml folder] [contig left name] [contig right name]'"
 	sys.exit()
 
 # Recebe as variaveis da chamada
@@ -37,6 +39,9 @@ print "\n------------------------- Running mapRepeat -------------------------"
 
 # Extrai as sequencias proximas ao gap
 for i in SeqIO.parse(contigs,"fasta"):
+	print i.id
+	left = left.replace("\r","")
+	right = right.replace("\r","")
 	if(i.id == left):
 		seq_left = str(i.seq)
 	if(i.id == right):
@@ -46,11 +51,11 @@ for i in SeqIO.parse(contigs,"fasta"):
 tam_seq_left = len(seq_left)
 tam_seq_right = len(seq_right)
 
-if(tam_seq_left > 5000):
-	seq_left = seq_left[-5000:]
+if(tam_seq_left > 3000):
+	seq_left = seq_left[-3000:]
 
-if(tam_seq_right > 5000):
-	seq_right = seq_right[:5000]
+if(tam_seq_right > 3000):
+	seq_right = seq_right[:3000]
 
 # Grava sequencia esquerda
 l = open('tmp_seq_left.txt','w')
@@ -94,7 +99,7 @@ e.closed
 begin_cut_reference = begin_cut_reference-1
 
 # IMPORTANTE: pontos de corte armazenados em begin_cut_reference e end_cut_reference
-print "\nStep 2/5: returns the position of the beginning of 5000pb before of gap and the position of the end of 5000pb after of gap in a reference genome. \nSuccess."
+print "\nStep 2/5: returns the position of the beginning of 5000pb before of gap and the position of the end of 3000pb after of gap in a reference genome. \nSuccess."
 
 
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -142,8 +147,8 @@ print "\nStep 3/5: cuts the marked region in the reference genome. \nSuccess."
 #
 # -------------------------------------------------------------------------------------------------------------------------------
 
-# Modelo manifest OPTIONAL \nparameters = -AS:urd=yes
-manifest = "project = tmp_map \njob = genome,mapping,accurate \n\nreadgroup \nis_reference \ndata = %s\n\nreadgroup = fragment \ntechnology = iontor \ndata = %s*.fastq %s*.xml" %(tmp_cut_seq,fastq,fastq)
+# Modelo manifest OPTIONAL \nparameters = -AS:urd=yes -OUT:ora=on => formato ace
+manifest = "project = tmp_map \njob = genome,mapping,accurate \nparameters = -OUT:rtd=on:ort=on:orh=on \n\nreadgroup \nis_reference \ndata = %s\n\nreadgroup = fragment \ntechnology = iontor \ndata = %s*.fastq %s*.xml" %(tmp_cut_seq,fastq,fastq)
 
 print "\nManifest file\n"
 print manifest
@@ -153,7 +158,9 @@ m.write(manifest)
 m.close()
 m.closed
 
-command = "mira4.0 tmp_map.manifest"
+# Modificado para ser executado da pasta F4
+#command = "mira tmp_map.manifest"
+command = "../../../../../bin/mira tmp_map.manifest" 
 
 os.system(command)
 
@@ -181,6 +188,8 @@ os.system(query_left)
 os.system(query_right)
 tmpA = open('tmp_left_position_map_result_end.txt','r')
 tmpB = open('tmp_right_position_map_result_start.txt','r')
+
+'''
 # Tentando corrigir uma falha do blast (apresenta 2 resultados quando deveria apresentar so 1) 
 # Right
 cr = tmpB.readlines()
@@ -197,8 +206,11 @@ cl = tmpA.readlines()
 cut_left = 0
 for i in cl:
 	if(int(i) > cut_left):
-		cut_left = int(i)
+		cut_left = int(i) 
 cut_left = cut_left+1
+'''
+cut_left = int(tmpA.readline())
+cut_right = int(tmpB.readline())
 
 tmpA.close()
 tmpA.closed
@@ -206,21 +218,23 @@ tmpB.close()
 tmpB.closed
 
 seq_mira = seq_mira[cut_left:cut_right]
+print "cut_left: %d | Cut right: %d " %(cut_left,cut_right)
+print "Sequence inserted: "+seq_mira
 
 # REMOVE O GAP
 sf = open(contigs,'r')
 genome = sf.read()
-remove_contig_id = ">%s" %(right)
+remove_contig_id = "\n>%s\n" %(right)
 gap_closed = genome.replace(remove_contig_id,seq_mira)
 
 sf.close()
 sf.closed
 
-g = open('final_seq_contigs.fasta','w')
+g = open('m4_PART.fasta','w')
 g.write(gap_closed)
 g.close()
 g.closed
 
 # IMPORTANTE: essa etapa sera corretamente ajustada quando for feito outro alinhamento contra uma referencia
 print "\nStep 5/5: transfers the consensus of mapping to close the gap. \nSuccess."
-print "\nResult: final_seq_contigs.fasta\n"
+print "\nResult: m4_PART.fasta\n"

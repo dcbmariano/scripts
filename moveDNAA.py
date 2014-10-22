@@ -3,7 +3,7 @@
 #    Function: Recebe um arquivo fasta (scaffold) e uma referencia. Busca o gene dnaA e o move para o comeco
 # Description: 
 #      Author: Diego Mariano
-#     Version: 1
+#     Version: 2
 
 from Bio import SeqIO
 import sys
@@ -45,6 +45,7 @@ for i in SeqIO.parse(sequence,"fasta"):
 
 print "Searching dnaA in your data... OK"
 dnaa_before = seq.rstrip()[:cut]
+cut = cut - 1 #Correcao do erro: faltava 1 nucleotideo
 dnaa_after = seq.rstrip()[cut:]
 last_gap = "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 

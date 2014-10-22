@@ -62,6 +62,6 @@ while i < tam_seq:
 			tamGap = 0
 
 	i = i + 1
-
+print cont-1
 w.close()
 w.closed

@@ -159,8 +159,8 @@ m.close()
 m.closed
 
 # Modificado para ser executado da pasta F4
-#command = "mira tmp_map.manifest"
-command = "../../../../../bin/mira tmp_map.manifest" 
+command = "mira tmp_map.manifest"
+#command = "../../../../../bin/mira tmp_map.manifest" 
 
 os.system(command)
 

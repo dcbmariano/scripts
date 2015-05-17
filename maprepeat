@@ -1,2 +1,0 @@
-#!/bin/bash
-python26 /home/dmariano/scripts/mapRepeat.py $1 $2 $3 $4 $5

@@ -1,0 +1,2 @@
+#!/bin/bash
+python ~/bin/contiginfo.py $1 $2
